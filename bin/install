@@ -3,8 +3,6 @@
 source $(dirname $0)/utils
 
 install_swift() {
-  # https://download.swift.org/swift-5.9.1-release/centos7/swift-5.9.1-RELEASE/swift-5.9.1-RELEASE-centos7.tar.gz
-
   check_deps
   local version="$1"
   local install_path="$2"
