@@ -3,19 +3,22 @@
 source $(dirname $0)/utils
 
 install_swift() {
+  # https://download.swift.org/swift-5.9.1-release/centos7/swift-5.9.1-RELEASE/swift-5.9.1-RELEASE-centos7.tar.gz
+
+  check_deps
   local version="$1"
   local install_path="$2"
-
   local tmp_dir="$(mktemp -d -t asdf-swift.XXX)"
 
-  ensure_swiftenv_installed
-  ensure_ninja_installed
+  echo "info: downloading swift version $version"
+  curl -sL "https://download.swift.org/swift-$version-release/centos7/swift-$version-RELEASE/swift-$version-RELEASE-centos7.tar.gz" -o "$tmp_dir/swift-$version-release.tar.gz"
+  
+  echo "info: extracting the swift centos7 tarball"
+  tar -xf "$tmp_dir/swift-$version-release.tar.gz" -C "$tmp_dir"
 
-  ASDF_CONCURRENCY="${ASDF_CONCURRENCY:-1}"
-  echo "swiftenv install $version $install_path"
-  MAKE_OPTS="$MAKE_OPTS -j$ASDF_CONCURRENCY" TMP_DIR="$tmp_dir" SWIFTENV_ROOT="$install_path" $(swiftenv_path) install $version
-  echo "Cleaning up"
-  rm -rf "$tmp_dir"
+  echo "info: cleaning up"
+  mv $tmp_dir/swift-$version-RELEASE-centos7/usr/* "$install_path"
+  rm -rf $tmp_dir
 }
 
 install_swift $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH

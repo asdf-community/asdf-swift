@@ -1,56 +1,13 @@
 #!/usr/bin/env bash
 
-ensure_swiftenv_installed() {
-  if [ ! -f "$(swiftenv_path)" ]; then
-    download_swiftenv
-  fi
+function error() {
+  echo "error: $1"
+  exit 1
 }
 
-download_swiftenv() {
-  echo "Downloading swiftenv..."
-  local swiftenv_url="https://github.com/kylef/swiftenv.git"
-  git clone $swiftenv_url "$(swiftenv_dir)"
-}
-
-swiftenv_path() {
-  echo "$(dirname $(dirname $0))/swiftenv/bin/swiftenv"
-}
-
-swiftenv_dir() {
-  echo "$(dirname $(dirname $0))/swiftenv"
-}
-
-ninja_path() {
-  echo "$(dirname $(dirname $0))/ninja/ninja"
-}
-
-ninja_dir() {
-  echo "$(dirname $(dirname $0))/ninja"
-}
-
-ensure_ninja_installed() {
-  if [ ! -f "$(ninja_path)" ]; then
-    ensure_swiftenv_installed
-    download_ninja
-  fi
-}
- 
-download_ninja() {
-  local tmp_dir="$(mktemp -d -t asdf-swift-ninja.XXX)"
-  echo "Downloading ninja..."
-  if [ "$(uname)" == "Darwin" ]; then
-    if [ -f "$(which brew)" ]; then
-      brew install cmake ninja
-    elif  [ -f "$(which port)" ]; then
-      sudo port install cmake ninja
-    fi
-  elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    if [ -f "$(which pacman)" ]; then
-      sudo pacman -S perl libbsd icu git libedit python2 clang cmake ninja
-    elif  [ -f "$(which apt-get)" ]; then
-      sudo apt-get install git cmake ninja-build clang python uuid-dev libicu-dev icu-devtools libbsd-dev libedit-dev libxml2-dev libsqlite3-dev swig libpython2-dev libncurses5-dev pkg-config
-    fi    
-  elif [ "$(expr substr $(uname -s) 1 10)" == "MINGW32_NT" ]; then
-    local ninja_url="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip"
-  fi
+function check_deps() {
+  [ ! -f "/usr/lib/libtinfo.so.5" ] && error "libtinfo version 5 is required"
+  [ ! -x "$(command -v curl)" ] && error "curl is required for downloading"
+  [ ! -x "$(command -v tar)" ] && error "tar is required for extraction"
+  [ ! -x "$(command -v jq)" ] && error "jq is required for json parsing"
 }
