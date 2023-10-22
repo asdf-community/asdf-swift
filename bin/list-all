@@ -4,7 +4,7 @@ source $(dirname $0)/utils
 
 list_all() {
   check_deps
-  curl -sL https://api.github.com/repos/apple/swift/releases | jq '.[].tag_name' | cut -d '-' -f 2 | tr '\n' ' '
+  curl -sL https://api.github.com/repos/apple/swift/releases | jq '.[].tag_name' | head -n25 | cut -d '-' -f 2 | tr '\n' ' '
 }
 
 list_all
