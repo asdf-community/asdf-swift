@@ -8,13 +8,13 @@ install_swift() {
   local install_path="$2"
   local tmp_dir="$(mktemp -d -t asdf-swift.XXX)"
 
-  echo "info: downloading swift version $version"
+  echo -e "\033[0;32minfo:\033[0m downloading swift version $version"
   curl -sL "https://download.swift.org/swift-$version-release/centos7/swift-$version-RELEASE/swift-$version-RELEASE-centos7.tar.gz" -o "$tmp_dir/swift-$version-release.tar.gz"
   
-  echo "info: extracting the swift centos7 tarball"
+  echo -e "\033[0;32minfo:\033[0m extracting the swift centos7 tarball"
   tar -xf "$tmp_dir/swift-$version-release.tar.gz" -C "$tmp_dir"
 
-  echo "info: cleaning up"
+  echo -e "\033[0;32minfo:\033[0m cleaning up"
   mv $tmp_dir/swift-$version-RELEASE-centos7/usr/* "$install_path"
   rm -rf $tmp_dir
 }
