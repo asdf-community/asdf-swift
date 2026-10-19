@@ -4,11 +4,13 @@ Swift plugin for https://github.com/asdf-vm/asdf/
 
 ## Requirements
 
-This plugin requires `curl`, `jq`, `tar`, `gzip` and `libtinfo` version 5. On Arch Linux you can
-install them with:
+This plugin requires `curl`, `jq` and `tar`. On Ubuntu 22.04 and 24.04, it installs the matching
+official Linux toolchain archive. Other distributions use the CentOS 7 toolchain archive.
+
+On Arch Linux you can install the required tools with:
 
 ```txt
-sudo pacman -S curl jq tar gunzip ncurses5-compat-libs
+sudo pacman -S curl jq tar
 ```
 
 ## Installation and Usage
