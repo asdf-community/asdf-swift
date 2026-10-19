@@ -6,17 +6,48 @@ install_swift() {
   check_deps
   local version="$1"
   local install_path="$2"
-  local tmp_dir="$(mktemp -d -t asdf-swift.XXX)"
+  local tmp_dir
+  local archive_url
+  local archive_dir
+  local archive_platform
+  tmp_dir="$(mktemp -d -t asdf-swift.XXX)"
+  trap 'rm -rf "$tmp_dir"' EXIT
+
+  if [ -r /etc/os-release ]; then
+    . /etc/os-release
+  fi
+
+  case "${ID:-}" in
+    ubuntu)
+      case "${VERSION_ID:-}" in
+        22.04|24.04)
+          archive_platform="ubuntu${VERSION_ID/./}"
+          archive_dir="swift-$version-RELEASE-ubuntu$VERSION_ID"
+          archive_url="https://download.swift.org/swift-$version-release/$archive_platform/swift-$version-RELEASE/$archive_dir.tar.gz"
+          ;;
+        *)
+          error "Swift asdf plugin supports Ubuntu 22.04 and 24.04; found ${VERSION_ID:-unknown}"
+          ;;
+      esac
+      ;;
+    *)
+      archive_platform="centos7"
+      archive_dir="swift-$version-RELEASE-centos7"
+      archive_url="https://download.swift.org/swift-$version-release/centos7/$archive_dir/$archive_dir.tar.gz"
+      ;;
+  esac
 
   echo -e "\033[0;32minfo:\033[0m downloading swift version $version"
-  curl -sL "https://download.swift.org/swift-$version-release/centos7/swift-$version-RELEASE/swift-$version-RELEASE-centos7.tar.gz" -o "$tmp_dir/swift-$version-release.tar.gz"
+  curl -fSL "$archive_url" -o "$tmp_dir/swift-$version-release.tar.gz" || error "failed to download Swift $version"
   
-  echo -e "\033[0;32minfo:\033[0m extracting the swift centos7 tarball"
-  tar -xf "$tmp_dir/swift-$version-release.tar.gz" -C "$tmp_dir"
+  echo -e "\033[0;32minfo:\033[0m extracting the Swift $archive_platform tarball"
+  tar -xf "$tmp_dir/swift-$version-release.tar.gz" -C "$tmp_dir" || error "failed to extract Swift $version"
 
-  echo -e "\033[0;32minfo:\033[0m cleaning up"
-  mv $tmp_dir/swift-$version-RELEASE-centos7/usr/* "$install_path"
-  rm -rf $tmp_dir
+  [ -d "$tmp_dir/$archive_dir/usr" ] || error "Swift archive has an unexpected layout"
+  mkdir -p "$install_path"
+  mv "$tmp_dir/$archive_dir/usr/"* "$install_path/" || error "failed to install Swift $version"
+  rm -rf "$tmp_dir" || error "failed to clean up the Swift $version download"
+  trap - EXIT
 }
 
 install_swift $ASDF_INSTALL_VERSION $ASDF_INSTALL_PATH

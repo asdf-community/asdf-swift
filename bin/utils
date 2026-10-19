@@ -6,8 +6,7 @@ function error() {
 }
 
 function check_deps() {
-  [ ! -f "/usr/lib/libtinfo.so.5" ] && error "libtinfo version 5 is required"
-  [ ! -x "$(command -v curl)" ] && error "curl is required for downloading"
-  [ ! -x "$(command -v tar)" ] && error "tar is required for extraction"
-  [ ! -x "$(command -v jq)" ] && error "jq is required for json parsing"
+  command -v curl >/dev/null 2>&1 || error "curl is required for downloading"
+  command -v tar >/dev/null 2>&1 || error "tar is required for extraction"
+  command -v jq >/dev/null 2>&1 || error "jq is required for json parsing"
 }
